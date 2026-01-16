@@ -1,0 +1,23 @@
+{
+  "name": "wavespeed-chat",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "turbo build",
+    "dev": "turbo dev",
+    "lint": "turbo lint",
+    "clean": "turbo clean",
+    "db:migrate": "pnpm --filter database db:migrate",
+    "db:seed": "pnpm --filter database db:seed",
+    "db:generate": "pnpm --filter database db:generate",
+    "db:studio": "pnpm --filter database db:studio"
+  },
+  "devDependencies": {
+    "turbo": "^2.0.0",
+    "typescript": "^5.3.3"
+  },
+  "packageManager": "pnpm@8.15.0",
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

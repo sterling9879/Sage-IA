@@ -1,0 +1,146 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 255 255 255;
+    --foreground: 15 23 42;
+  }
+
+  .dark {
+    --background: 15 23 42;
+    --foreground: 241 245 249;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-dark-200 dark:border-dark-700;
+  }
+
+  body {
+    @apply bg-white text-dark-900 dark:bg-dark-950 dark:text-dark-100;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    @apply w-2;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply rounded-full bg-dark-300 dark:bg-dark-600;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-dark-400 dark:bg-dark-500;
+  }
+}
+
+@layer components {
+  /* Prose styles for markdown content */
+  .prose {
+    @apply text-dark-900 dark:text-dark-100;
+  }
+
+  .prose a {
+    @apply text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300;
+  }
+
+  .prose code {
+    @apply rounded bg-dark-100 px-1 py-0.5 text-primary-600 dark:bg-dark-800 dark:text-primary-400;
+  }
+
+  .prose pre {
+    @apply rounded-lg bg-dark-900 p-4;
+  }
+
+  .prose pre code {
+    @apply bg-transparent p-0 text-inherit;
+  }
+
+  .prose blockquote {
+    @apply border-l-4 border-primary-500 pl-4 italic text-dark-600 dark:text-dark-400;
+  }
+
+  .prose h1,
+  .prose h2,
+  .prose h3,
+  .prose h4 {
+    @apply font-semibold text-dark-900 dark:text-dark-100;
+  }
+
+  .prose ul,
+  .prose ol {
+    @apply pl-6;
+  }
+
+  .prose li {
+    @apply marker:text-dark-500;
+  }
+
+  .prose table {
+    @apply w-full border-collapse;
+  }
+
+  .prose th,
+  .prose td {
+    @apply border border-dark-200 px-3 py-2 text-left dark:border-dark-700;
+  }
+
+  .prose th {
+    @apply bg-dark-50 font-semibold dark:bg-dark-800;
+  }
+}
+
+@layer utilities {
+  /* Hide scrollbar but keep functionality */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Text gradient */
+  .text-gradient {
+    @apply bg-gradient-to-r from-primary-500 to-primary-700 bg-clip-text text-transparent;
+  }
+
+  /* Animations */
+  .animate-in {
+    animation: animate-in 0.2s ease-out;
+  }
+
+  .animate-out {
+    animation: animate-out 0.2s ease-in;
+  }
+
+  @keyframes animate-in {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  @keyframes animate-out {
+    from {
+      opacity: 1;
+      transform: scale(1);
+    }
+    to {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+  }
+}

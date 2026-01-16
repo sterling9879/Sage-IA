@@ -1,0 +1,71 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: wavespeed-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: wavespeed
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-changeme}
+      POSTGRES_DB: wavespeed_chat
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U wavespeed -d wavespeed_chat']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Web App
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    container_name: wavespeed-web
+    restart: unless-stopped
+    ports:
+      - '3000:3000'
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://wavespeed:${DB_PASSWORD:-changeme}@postgres:5432/wavespeed_chat
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # Admin App
+  admin:
+    build:
+      context: .
+      dockerfile: apps/admin/Dockerfile
+    container_name: wavespeed-admin
+    restart: unless-stopped
+    ports:
+      - '3001:3001'
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://wavespeed:${DB_PASSWORD:-changeme}@postgres:5432/wavespeed_chat
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # Nginx Reverse Proxy (optional)
+  nginx:
+    image: nginx:alpine
+    container_name: wavespeed-nginx
+    restart: unless-stopped
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+    depends_on:
+      - web
+      - admin
+
+volumes:
+  postgres_data:
