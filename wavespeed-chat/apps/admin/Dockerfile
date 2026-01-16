@@ -2,7 +2,7 @@
 # Base Stage
 # ================================
 FROM node:20-alpine AS base
-RUN apk add --no-cache libc6-compat
+RUN apk add --no-cache libc6-compat openssl openssl-dev
 RUN npm install -g pnpm
 
 # ================================
@@ -48,7 +48,7 @@ RUN pnpm --filter admin build
 # ================================
 # Runner Stage
 # ================================
-FROM node:20-alpine AS runner
+FROM base AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
@@ -57,14 +57,12 @@ ENV NEXT_TELEMETRY_DISABLED=1
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
-# Copy necessary files
-COPY --from=builder /app/apps/admin/public ./apps/admin/public
-COPY --from=builder /app/apps/admin/.next/standalone ./
-COPY --from=builder /app/apps/admin/.next/static ./apps/admin/.next/static
-
-# Copy Prisma files
-COPY --from=builder /app/packages/database/prisma ./packages/database/prisma
-COPY --from=builder /app/node_modules/.pnpm/@prisma+client*/node_modules/.prisma ./node_modules/.prisma
+# Copy built application
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/apps/admin ./apps/admin
+COPY --from=builder /app/packages ./packages
+COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/pnpm-workspace.yaml ./pnpm-workspace.yaml
 
 USER nextjs
 
@@ -73,4 +71,4 @@ EXPOSE 3001
 ENV PORT=3001
 ENV HOSTNAME="0.0.0.0"
 
-CMD ["node", "apps/admin/server.js"]
+CMD ["pnpm", "--filter", "admin", "start"]
