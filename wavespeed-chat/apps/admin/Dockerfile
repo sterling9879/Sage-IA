@@ -1,8 +1,8 @@
 # ================================
-# Base Stage
+# Base Stage (Debian-based for Prisma compatibility)
 # ================================
-FROM node:20-alpine AS base
-RUN apk add --no-cache libc6-compat openssl openssl-dev
+FROM node:20-slim AS base
+RUN apt-get update && apt-get install -y openssl ca-certificates && rm -rf /var/lib/apt/lists/*
 RUN npm install -g pnpm
 
 # ================================
@@ -54,8 +54,8 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
+RUN groupadd --system --gid 1001 nodejs
+RUN useradd --system --uid 1001 --home-dir /home/nextjs --create-home nextjs
 
 # Copy built application
 COPY --from=builder /app/node_modules ./node_modules
@@ -64,6 +64,9 @@ COPY --from=builder /app/packages ./packages
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/pnpm-workspace.yaml ./pnpm-workspace.yaml
 
+# Set ownership
+RUN chown -R nextjs:nodejs /app
+
 USER nextjs
 
 EXPOSE 3001
@@ -71,4 +74,5 @@ EXPOSE 3001
 ENV PORT=3001
 ENV HOSTNAME="0.0.0.0"
 
-CMD ["pnpm", "--filter", "admin", "start"]
+WORKDIR /app/apps/admin
+CMD ["../../node_modules/.bin/next", "start", "-p", "3001"]
