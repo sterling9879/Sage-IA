@@ -55,7 +55,7 @@ ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
 RUN groupadd --system --gid 1001 nodejs
-RUN useradd --system --uid 1001 nextjs
+RUN useradd --system --uid 1001 --home-dir /home/nextjs --create-home nextjs
 
 # Copy built application
 COPY --from=builder /app/node_modules ./node_modules
@@ -64,6 +64,9 @@ COPY --from=builder /app/packages ./packages
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/pnpm-workspace.yaml ./pnpm-workspace.yaml
 
+# Set ownership
+RUN chown -R nextjs:nodejs /app
+
 USER nextjs
 
 EXPOSE 3000
@@ -71,4 +74,5 @@ EXPOSE 3000
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
-CMD ["pnpm", "--filter", "web", "start"]
+WORKDIR /app/apps/web
+CMD ["../../node_modules/.bin/next", "start"]
