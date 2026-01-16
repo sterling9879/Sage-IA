@@ -22,4 +22,4 @@ COPY packages/database ./packages/database
 RUN pnpm --filter database db:generate
 
 # Run migrations and seed
-CMD ["sh", "-c", "pnpm --filter database db:migrate && pnpm --filter database db:seed"]
+CMD ["sh", "-c", "pnpm --filter database db:push && pnpm --filter database db:seed"]
