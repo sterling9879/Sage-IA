@@ -75,4 +75,4 @@ ENV PORT=3001
 ENV HOSTNAME="0.0.0.0"
 
 WORKDIR /app/apps/admin
-CMD ["../../node_modules/.bin/next", "start", "-p", "3001"]
+CMD ["npx", "next", "start", "-p", "3001"]

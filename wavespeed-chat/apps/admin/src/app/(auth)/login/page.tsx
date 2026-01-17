@@ -28,8 +28,8 @@ export default function AdminLoginPage() {
       if (result?.error) {
         setError(result.error);
       } else {
-        router.push('/');
-        router.refresh();
+        // Use window.location for full page navigation to ensure session is properly loaded
+        window.location.href = '/';
       }
     } catch {
       setError('Erro ao fazer login');
